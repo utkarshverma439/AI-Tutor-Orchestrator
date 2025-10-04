@@ -7,7 +7,7 @@ An advanced system that autonomously connects conversational AI tutors to educat
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
 [![LangChain](https://img.shields.io/badge/LangChain-Latest-orange.svg)](https://langchain.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache-yellow.svg)](LICENSE)
 
 ## ✨ Features
 
