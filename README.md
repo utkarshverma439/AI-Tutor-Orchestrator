@@ -9,9 +9,9 @@ A next-generation educational platform that autonomously orchestrates AI-powered
 [![LangChain](https://img.shields.io/badge/LangChain-Latest-orange.svg)](https://langchain.com)
 [![License](https://img.shields.io/badge/License-Apache-yellow.svg)](LICENSE)
 
-
 > **Disclaimer:** This project was previously known as **"AI Tutor Orchestrator"**.  
 > The name has been updated to **MentorOS** to better represent its expanded capabilities in user management, intelligent orchestration, and professional 3D web interface design.
+
 
 ## ✨ Features
 
