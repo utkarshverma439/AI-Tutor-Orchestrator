@@ -64,7 +64,7 @@ A next-generation educational platform that autonomously orchestrates AI-powered
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/utkarshverma439/AI-Tutor-Orchestrator.git
+   git clone https://github.com/utkarshverma439/MentorOS.git
    cd ai-tutor-orchestrator
    ```
 
