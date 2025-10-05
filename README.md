@@ -166,10 +166,10 @@ Shows backend orchestration, parameter extraction, and tool coordination in acti
 
 ---
 ### Login Page
-![Login](screenshots/login.png)
+![Login](screenshot/login.png)
 
 ### Signup Page
-![Signup](screenshots/signup.png)
+![Signup](screenshot/signup.png)
 
 ### 🎨 3D Web UI Design
 
