@@ -10,16 +10,61 @@ from pathlib import Path
 # Add the src directory to Python path
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
+from typing import Optional
+import json
+from datetime import datetime
 
 from models.schemas import OrchestrationRequest, OrchestrationResponse
 from core.orchestration_agent import OrchestrationAgent
 from core.state_manager import StateManager
+try:
+    from database.database import init_database
+    from database.user_service import UserService
+    DATABASE_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Database imports failed: {e}")
+    print("🔄 Running without database support")
+    DATABASE_AVAILABLE = False
+    
+    # Create mock functions for database operations
+    async def init_database():
+        print("📝 Database disabled - using demo mode")
+        pass
+    
+    class UserService:
+        @staticmethod
+        async def create_user(*args, **kwargs):
+            return None
+        
+        @staticmethod
+        async def get_user_by_email(*args, **kwargs):
+            return None
+        
+        @staticmethod
+        async def update_last_login(*args, **kwargs):
+            return True
+        
+        @staticmethod
+        async def create_session(*args, **kwargs):
+            return type('Session', (), {'session_token': 'demo_token', 'expires_at': datetime.now()})()
+        
+        @staticmethod
+        async def clear_chat_history(*args, **kwargs):
+            return True
+        
+        @staticmethod
+        async def export_chat_history(*args, **kwargs):
+            return []
+        
+        @staticmethod
+        async def update_user_profile(*args, **kwargs):
+            return True
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +77,18 @@ state_manager: StateManager = None
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     global orchestration_agent, state_manager
+    
+    # Initialize database
+    try:
+        if DATABASE_AVAILABLE:
+            await init_database()
+            print("✅ Database initialized")
+        else:
+            print("📝 Running in demo mode without database")
+    except Exception as e:
+        print(f"❌ Database initialization failed: {str(e)}")
+        print("🔄 Continuing in demo mode")
+        # Continue without database for demo mode
     
     # Initialize components with new LLM configuration
     try:
@@ -83,6 +140,21 @@ async def serve_script():
     """Serve script.js directly."""
     return FileResponse("static/script.js", media_type="application/javascript")
 
+@app.get("/login.html")
+async def serve_login():
+    """Serve login page."""
+    return FileResponse("static/login.html", media_type="text/html")
+
+@app.get("/login-styles.css")
+async def serve_login_styles():
+    """Serve login styles."""
+    return FileResponse("static/login-styles.css", media_type="text/css")
+
+@app.get("/login-script.js")
+async def serve_login_script():
+    """Serve login script."""
+    return FileResponse("static/login-script.js", media_type="application/javascript")
+
 def get_orchestration_agent() -> OrchestrationAgent:
     """Dependency to get orchestration agent."""
     if orchestration_agent is None:
@@ -99,6 +171,46 @@ def get_state_manager() -> StateManager:
 async def serve_frontend():
     """Serve the main frontend application."""
     return FileResponse("static/index.html")
+
+@app.get("/dashboard")
+async def serve_dashboard():
+    """Serve the main dashboard (alias for root)."""
+    return FileResponse("static/index.html")
+
+@app.get("/welcome")
+async def serve_welcome():
+    """Serve the welcome page."""
+    return FileResponse("static/welcome.html")
+
+@app.get("/settings")
+async def serve_settings():
+    """Serve the settings page."""
+    return FileResponse("static/settings.html")
+
+@app.get("/settings.html")
+async def serve_settings_html():
+    """Serve the settings page (alternative route)."""
+    return FileResponse("static/settings.html")
+
+@app.get("/settings-script.js")
+async def serve_settings_script():
+    """Serve settings script."""
+    return FileResponse("static/settings-script.js", media_type="application/javascript")
+
+@app.get("/signup.html")
+async def serve_signup():
+    """Serve the signup page."""
+    return FileResponse("static/signup.html", media_type="text/html")
+
+@app.get("/signup")
+async def serve_signup_alt():
+    """Serve the signup page (alternative route)."""
+    return FileResponse("static/signup.html", media_type="text/html")
+
+@app.get("/signup-script.js")
+async def serve_signup_script():
+    """Serve signup script."""
+    return FileResponse("static/signup-script.js", media_type="application/javascript")
 
 @app.post("/orchestrate", response_model=OrchestrationResponse)
 async def orchestrate_tools(
@@ -234,6 +346,72 @@ async def update_user_preferences(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update preferences: {str(e)}")
 
+@app.post("/user/{user_id}/profile")
+async def update_user_profile(user_id: str, profile_data: dict):
+    """Update user profile information."""
+    try:
+        success = await UserService.update_user_profile(user_id, profile_data)
+        if success:
+            return {"success": True, "message": "Profile updated successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+
+@app.get("/user/{user_id}/chat/history")
+async def get_chat_history(user_id: str, limit: int = 50):
+    """Get user's chat history."""
+    try:
+        messages = await UserService.get_chat_history(user_id, limit)
+        return {
+            "success": True,
+            "messages": [
+                {
+                    "id": msg.id,
+                    "role": msg.role,
+                    "content": msg.content,
+                    "timestamp": msg.timestamp.isoformat(),
+                    "tools_used": msg.tools_used,
+                    "tool_results": msg.tool_results
+                }
+                for msg in messages
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get chat history: {str(e)}")
+
+@app.delete("/user/{user_id}/chat/history")
+async def clear_chat_history(user_id: str):
+    """Clear user's chat history."""
+    try:
+        success = await UserService.clear_chat_history(user_id)
+        return {"success": success, "message": "Chat history cleared successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to clear chat history: {str(e)}")
+
+@app.get("/user/{user_id}/chat/export")
+async def export_chat_history(user_id: str):
+    """Export user's chat history."""
+    try:
+        chat_data = await UserService.export_chat_history(user_id)
+        
+        # Create export data
+        export_data = {
+            "user_id": user_id,
+            "export_date": datetime.utcnow().isoformat(),
+            "message_count": len(chat_data),
+            "messages": chat_data
+        }
+        
+        return JSONResponse(
+            content=export_data,
+            headers={
+                "Content-Disposition": f"attachment; filename=mentoros_chat_export_{user_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export chat history: {str(e)}")
+
 @app.delete("/user/{user_id}/session")
 async def clear_user_session(
     user_id: str,
@@ -350,7 +528,173 @@ async def demo_educational_tools(
 @app.get("/favicon.ico")
 async def favicon():
     """Serve favicon."""
-    return FileResponse("static/favicon.ico", status_code=404)
+    return FileResponse("static/favicon.png", media_type="image/png")
+
+@app.get("/favicon.png")
+async def favicon_png():
+    """Serve favicon PNG."""
+    return FileResponse("static/favicon.png", media_type="image/png")
+
+@app.post("/auth/login")
+async def login(request: Request):
+    """Handle user login."""
+    try:
+        body = await request.json()
+        email = body.get("email")
+        password = body.get("password")
+        provider = body.get("provider")
+        
+        if not email:
+            raise HTTPException(status_code=400, detail="Email is required")
+        
+        # For demo purposes, accept any email/password
+        # In production, you would verify credentials here
+        
+        # Get or create user
+        user = await UserService.get_user_by_email(email)
+        if not user:
+            name = email.split("@")[0].title()
+            user = await UserService.create_user(
+                email=email,
+                name=name,
+                provider=provider
+            )
+        
+        # Update last login
+        await UserService.update_last_login(user.id)
+        
+        # Create session
+        client_ip = request.client.host if request.client else None
+        user_agent = request.headers.get("user-agent")
+        session = await UserService.create_session(
+            user_id=user.id,
+            ip_address=client_ip,
+            user_agent=user_agent
+        )
+        
+        return {
+            "success": True,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name,
+                "grade_level": user.grade_level,
+                "learning_style": user.learning_style,
+                "emotional_state": user.emotional_state,
+                "teaching_style": user.teaching_style
+            },
+            "session_token": session.session_token,
+            "expires_at": session.expires_at.isoformat()
+        }
+        
+    except Exception as e:
+        print(f"❌ Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@app.post("/auth/signup")
+async def signup(request: Request):
+    """Handle user signup."""
+    try:
+        body = await request.json()
+        name = body.get("name")
+        email = body.get("email")
+        password = body.get("password")
+        provider = body.get("provider")
+        grade_level = body.get("grade_level", "10")
+        
+        if not email or not name:
+            raise HTTPException(status_code=400, detail="Name and email are required")
+        
+        # Check if user already exists
+        existing_user = await UserService.get_user_by_email(email)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="An account with this email already exists")
+        
+        # Create new user
+        user = await UserService.create_user(
+            email=email,
+            name=name,
+            provider=provider,
+            grade_level=grade_level
+        )
+        
+        # Create session
+        client_ip = request.client.host if request.client else None
+        user_agent = request.headers.get("user-agent")
+        session = await UserService.create_session(
+            user_id=user.id,
+            ip_address=client_ip,
+            user_agent=user_agent
+        )
+        
+        return {
+            "success": True,
+            "message": "Account created successfully",
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name,
+                "grade_level": user.grade_level,
+                "learning_style": user.learning_style,
+                "emotional_state": user.emotional_state,
+                "teaching_style": user.teaching_style
+            },
+            "session_token": session.session_token,
+            "expires_at": session.expires_at.isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Signup error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Signup failed: {str(e)}")
+
+@app.post("/auth/logout")
+async def logout(request: Request):
+    """Handle user logout."""
+    try:
+        body = await request.json()
+        session_token = body.get("session_token")
+        
+        if session_token:
+            await UserService.invalidate_session(session_token)
+        
+        return {"success": True, "message": "Logged out successfully"}
+        
+    except Exception as e:
+        print(f"❌ Logout error: {str(e)}")
+        return {"success": True, "message": "Logged out"}  # Always succeed for logout
+
+@app.get("/auth/verify")
+async def verify_session(session_token: str):
+    """Verify user session."""
+    try:
+        session = await UserService.get_session(session_token)
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid or expired session")
+        
+        user = await UserService.get_user_by_id(session.user_id)
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return {
+            "valid": True,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name,
+                "grade_level": user.grade_level,
+                "learning_style": user.learning_style,
+                "emotional_state": user.emotional_state,
+                "teaching_style": user.teaching_style
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Session verification error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Session verification failed")
 
 @app.get("/test")
 async def test_endpoint():

@@ -1,22 +1,35 @@
-# 🧠 AI Tutor Orchestrator
+# 🧠 MentorOS - Professional AI Tutoring Platform
 
-**Intelligent middleware for autonomous AI tutoring systems with stunning 3D web interface**
+**Intelligent middleware for autonomous AI tutoring systems with professional 3D web interface**
 
-An advanced system that autonomously connects conversational AI tutors to educational tools through context-aware parameter extraction and intelligent orchestration, featuring a modern dark 3D web interface with smooth animations.
+A next-generation educational platform that autonomously orchestrates AI-powered tutoring tools through intelligent context analysis and parameter extraction. Features a stunning professional 3D web interface with glassmorphism design, user management, and persistent data storage.
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
 [![LangChain](https://img.shields.io/badge/LangChain-Latest-orange.svg)](https://langchain.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache-yellow.svg)](LICENSE)
+
+
+> **Disclaimer:** This project was previously known as **"AI Tutor Orchestrator"**.  
+> The name has been updated to **MentorOS** to better represent its expanded capabilities in user management, intelligent orchestration, and professional 3D web interface design.
 
 ## ✨ Features
 
-### 🎨 **Stunning 3D Web Interface**
-- **Dark Theme**: Professional dark mode with neon cyan/purple accents
-- **3D Effects**: Perspective transforms, depth shadows, and glassmorphism
-- **Smooth Animations**: 60fps fluid transitions and micro-interactions
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
-- **Real-time Chat**: Interactive conversation with AI orchestrator
+### 🎨 **Professional 3D Web Interface**
+- **Futuristic Design**: Deep space theme with neon blue, cyan, and violet gradients
+- **3D Glassmorphism**: Semi-transparent panels with backdrop blur and glowing edges
+- **Advanced Animations**: Three.js powered 3D backgrounds with floating geometric shapes
+- **Interactive Elements**: Particle networks, holographic effects, and smooth transitions
+- **Responsive Design**: Mobile-first approach with adaptive layouts for all devices
+- **Professional Login**: Secure authentication with 3D animated login interface
+
+### 👤 **Complete User Management System**
+- **User Registration**: Full signup flow with profile creation and database storage
+- **Secure Authentication**: Session-based login with token management
+- **Profile Management**: Comprehensive student profiles with learning preferences
+- **Settings Dashboard**: Dedicated settings page for profile and system preferences
+- **Data Management**: Export chat history, clear data, and reset settings
+- **Social Login**: Google and GitHub authentication support
 
 ### 🤖 **AI-Powered Orchestration**
 - **DeepSeek Integration**: Powered by DeepSeek AI via OpenRouter (with OpenAI fallback)
@@ -24,6 +37,7 @@ An advanced system that autonomously connects conversational AI tutors to educat
 - **Parameter Extraction**: Automatic tool parameter inference from natural language
 - **Multi-Tool Coordination**: Seamless orchestration of multiple educational tools
 - **Adaptive Learning**: Personalized content based on student profile and learning style
+- **Persistent Storage**: SQLite database for user data, chat history, and preferences
 
 ### 📚 **Educational Tools**
 - **📝 Note Maker**: Generates structured notes with examples and analogies
@@ -36,6 +50,9 @@ An advanced system that autonomously connects conversational AI tutors to educat
 - **Emotional State Awareness**: Adapts content based on student's emotional state
 - **Session Management**: Maintains conversation history and learning patterns
 - **Health Monitoring**: Real-time system status and tool availability
+- **Learning Analytics**: Progress tracking with animated progress rings
+- **Data Export**: Download conversation history and learning data as JSON
+- **Chat Controls**: Clear history, export data, and toggle previous conversations
 
 ## 🚀 Quick Start
 
@@ -77,7 +94,14 @@ An advanced system that autonomously connects conversational AI tutors to educat
    Navigate to: http://127.0.0.1:8000
    ```
 
-That's it! The AI Tutor Orchestrator is now running with a beautiful 3D interface.
+That's it! MentorOS is now running with a professional 3D interface.
+
+### 🎯 **First Time Setup**
+1. **Experience the Login**: Visit the 3D animated login page
+2. **Create Account**: Click "Create Account" to register with your details
+3. **Explore Dashboard**: Navigate through the futuristic interface
+4. **Customize Settings**: Visit Settings to personalize your learning profile
+5. **Start Learning**: Begin conversations with the AI tutor orchestrator
 
 ## 💬 Usage Examples
 
@@ -141,6 +165,11 @@ Shows backend orchestration, parameter extraction, and tool coordination in acti
 ![Backend Results](screenshot/backend.png)
 
 ---
+### Login Page
+![Login](screenshots/login.png)
+
+### Signup Page
+![Signup](screenshots/signup.png)
 
 ### 🎨 3D Web UI Design
 
@@ -173,20 +202,33 @@ Side-by-side view of real-time AI conversation flow.
 ## 🔌 API Endpoints
 
 ### Main Endpoints
-- `GET /` - Serves the 3D web interface
+- `GET /` - Serves the main dashboard interface
+- `GET /login.html` - Professional 3D login page
+- `GET /signup.html` - User registration page
+- `GET /settings` - Settings and profile management page
 - `POST /orchestrate` - Main orchestration endpoint for educational requests
 - `GET /health` - Health check for all system components
 - `GET /tools` - List available educational tools and their capabilities
+
+### Authentication Endpoints
+- `POST /auth/login` - User login with database storage
+- `POST /auth/signup` - User registration and account creation
+- `POST /auth/logout` - User logout and session invalidation
+- `GET /auth/verify` - Session token verification
+
+### User Management
+- `GET /user/{user_id}/session` - Retrieve user session data
+- `POST /user/{user_id}/profile` - Update user profile information
+- `POST /user/{user_id}/preferences` - Update user learning preferences
+- `GET /user/{user_id}/chat/history` - Get user's chat history
+- `DELETE /user/{user_id}/chat/history` - Clear user's chat history
+- `GET /user/{user_id}/chat/export` - Export user's chat history as JSON
+- `DELETE /user/{user_id}/session` - Clear user session data
 
 ### Testing Endpoints
 - `GET /test` - Simple connectivity test
 - `POST /test-orchestrate` - Test orchestration without dependencies
 - `POST /analyze` - Context analysis without tool execution (for debugging)
-
-### User Management
-- `GET /user/{user_id}/session` - Retrieve user session data
-- `POST /user/{user_id}/preferences` - Update user learning preferences
-- `DELETE /user/{user_id}/session` - Clear user session data
 
 ### LLM Integration
 - `GET /llm/test` - Test LLM connection and configuration
@@ -209,8 +251,12 @@ API_HOST=127.0.0.1
 API_PORT=8000
 LOG_LEVEL=INFO
 
-# Database (optional - uses in-memory by default)
-DATABASE_URL=postgresql://user:password@localhost:5432/tutor_orchestrator
+# Database Configuration
+DATABASE_URL=sqlite:///./mentoros.db           # SQLite (default)
+ASYNC_DATABASE_URL=sqlite+aiosqlite:///./mentoros.db
+# OR PostgreSQL for production
+# DATABASE_URL=postgresql://user:password@localhost:5432/mentoros
+# ASYNC_DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/mentoros
 
 # External Tool APIs (optional - uses mock tools by default)
 NOTE_MAKER_API_URL=http://localhost:8001/api/note-maker
@@ -279,54 +325,76 @@ Specific testing for parameter extraction accuracy:
 ## 🎨 Frontend Features
 
 ### 3D Design Elements
-- **Perspective Effects**: Cards and panels with realistic depth
-- **Animated Background**: Moving grid pattern and floating orbs
-- **Glassmorphism**: Translucent panels with backdrop blur
-- **Neon Accents**: Cyan and purple gradient highlights
-- **Smooth Transitions**: Hardware-accelerated CSS animations
+- **Three.js Integration**: Real-time 3D geometric shapes and particle systems
+- **Glassmorphism**: Semi-transparent panels with backdrop blur effects
+- **Neon Gradients**: Blue, cyan, violet, and pink gradient accents
+- **Perspective Transforms**: Cards with realistic 3D depth and rotation
+- **Particle Networks**: Animated floating particles with connecting lines
+- **Holographic Effects**: Rotating rings and glowing animations
 
-### Interactive Components
-- **Real-time Chat**: Instant messaging with the AI orchestrator
-- **Student Profile**: Customizable learning preferences and emotional state
-- **System Status**: Live monitoring of AI model and tool availability
-- **Results Panel**: Detailed orchestration results with reasoning
-- **Suggestion Chips**: Quick-start conversation prompts
+### Professional Interface Components
+- **3D Login System**: Animated login card with floating geometric shapes
+- **Navigation Sidebar**: Glassmorphism navigation with hover effects
+- **Settings Dashboard**: Comprehensive profile and preference management
+- **Learning Analytics**: Animated SVG progress rings and statistics
+- **Chat Interface**: Real-time messaging with visual feedback
+- **Data Management**: Export, clear, and manage user data
 
-### Responsive Design
-- **Desktop**: Full 3D effects with dual-panel layout
-- **Tablet**: Optimized grid layout with maintained animations
-- **Mobile**: Single-column layout with touch-friendly controls
+### Advanced Interactions
+- **Mouse Parallax**: 3D background responds to cursor movement
+- **Smooth Animations**: GSAP-powered transitions and micro-interactions
+- **Visual Feedback**: Glowing effects, particle bursts, and hover states
+- **Responsive Design**: Adaptive layouts for desktop, tablet, and mobile
+- **Accessibility**: High contrast mode and reduced motion support
+
+### User Experience Features
+- **Onboarding Flow**: Guided signup and profile setup process
+- **Real-time Status**: Live connection indicators and system health
+- **Toast Notifications**: Professional notification system with icons
+- **Loading States**: Animated spinners and progress indicators
+- **Error Handling**: Graceful error messages and fallback states
 
 ### Keyboard Shortcuts
 - `Ctrl/Cmd + K`: Focus chat input
-- `Ctrl/Cmd + L`: Clear chat history
+- `Ctrl/Cmd + /`: Toggle navigation sidebar
 - `Enter`: Send message
 - `Shift + Enter`: New line in message
 
 ## 📁 Project Structure
 
 ```
-ai-tutor-orchestrator/
+mentoros/
 ├── 📄 README.md                    # This comprehensive guide
-├── 📄 requirements.txt             # Python dependencies
+├── 📄 requirements.txt             # Python dependencies with database support
 ├── 📄 .env.example                 # Environment template
 ├── 📄 .env                         # Your configuration (create from template)
 ├── 📄 start_server.py              # Easy startup script with health checks
-├── 📄 app.py                       # Main FastAPI application
+├── 📄 app.py                       # Main FastAPI application with auth
 ├── 📄 main.py                      # Alternative entry point
 ├── 📄 test_backend.py              # Backend component testing
 ├── 📄 test_parameter_extraction.py # Parameter extraction testing
 ├── 📁 screenshot/
+│   ├── signup.png
+│   ├── login.png
 │   ├── backend.png
 │   ├── ui_design.png
 │   ├── processing.png
 │   ├── conversation.png
 │   └── conversation2.png
 ├── 📁 static/                      # Frontend files
-│   ├── 📄 index.html              # 3D web interface
-│   ├── 📄 script.js               # Frontend JavaScript logic
-│   └── 📄 styles.css              # 3D dark theme CSS
-└── 📁 src/                         # Backend source code
+│   ├── 📄 index.html              # Main dashboard interface
+│   ├── 📄 login.html              # 3D login page
+│   ├── 📄 signup.html             # User registration page
+│   ├── 📄 settings.html           # Settings and profile management
+│   ├── �  welcome.html            # Welcome/navigation page
+│   ├── 📄 script.js               # Main dashboard JavaScript
+│   ├── 📄 login-script.js         # Login page functionality
+│   ├── 📄 signup-script.js        # Signup page functionality
+│   ├── � settings-scripgt.js      # Settings page functionality
+│   ├── 📄 styles.css              # Main 3D theme CSS
+│   ├── 📄 login-styles.css        # Login/signup specific styles
+│   └── � favilcon.png             # MentorOS logo icon
+└── � src/                         # Backend source code
     ├── 📁 core/                    # Core orchestration logic
     │   ├── 📄 context_analyzer.py         # Intent analysis & parameter extraction
     │   ├── 📄 orchestration_agent.py      # Main orchestration workflow
@@ -334,6 +402,11 @@ ai-tutor-orchestrator/
     │   ├── 📄 state_manager.py            # Session & preference management
     │   ├── 📄 mock_tools.py               # Mock educational tools
     │   └── 📄 llm_config.py               # LLM configuration & testing
+    ├── 📁 database/                # Database management
+    │   ├── 📄 __init__.py                  # Package initialization
+    │   ├── 📄 database.py                 # Database connection & session management
+    │   ├── 📄 models.py                   # SQLAlchemy models for users, sessions, chat
+    │   └── 📄 user_service.py             # User management service layer
     └── 📁 models/
         └── 📄 schemas.py                   # Pydantic data models
 ```
@@ -356,10 +429,17 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 4. Add tool recognition patterns in `src/core/context_analyzer.py`
 
 ### Customizing the UI
-- **Colors**: Edit CSS variables in `static/styles.css`
-- **Animations**: Modify transition properties and keyframes
-- **Layout**: Update HTML structure in `static/index.html`
-- **Interactions**: Enhance JavaScript logic in `static/script.js`
+- **Colors**: Edit CSS variables in `static/styles.css` and `static/login-styles.css`
+- **3D Effects**: Modify Three.js configurations in JavaScript files
+- **Animations**: Update GSAP animations and CSS keyframes
+- **Layout**: Update HTML structure across multiple page templates
+- **Database**: Extend models in `src/database/models.py` for new features
+
+### Database Management
+- **Models**: User, UserSession, ChatMessage, ToolUsage, UserPreferences
+- **Services**: User authentication, session management, data persistence
+- **Migrations**: Automatic table creation with SQLAlchemy
+- **Export/Import**: JSON-based data export and backup functionality
 
 ## 🚀 Deployment
 
@@ -379,15 +459,20 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
+RUN mkdir -p /app/data
 EXPOSE 8000
+ENV DATABASE_URL=sqlite:///./data/mentoros.db
+ENV ASYNC_DATABASE_URL=sqlite+aiosqlite:///./data/mentoros.db
 CMD ["python", "start_server.py"]
 ```
 
 ### Environment Setup for Production
 - Set `LOG_LEVEL=WARNING` for production
-- Configure proper database URL if using persistent storage
-- Set up reverse proxy (nginx) for static file serving
+- Configure PostgreSQL database URL for scalability
+- Set up reverse proxy (nginx) for static file serving and SSL
 - Configure SSL certificates for HTTPS
+- Set up database backups and user data protection
+- Configure session timeout and security headers
 
 Ah, got it! You want to **add the collaborators and their roles** to the new project — **AI Tutor Orchestrator** — not copy the collaborator section from the old one.
 
@@ -401,11 +486,11 @@ This project is a joint effort by:
 
 * **Utkarsh Verma**
   GitHub: [@utkarshverma439](https://github.com/utkarshverma439)
-  *Role: System Architect, AI Orchestration Pipeline, LLM Integration, Context Analysis, Backend Lead*
+  *Role: System Architect, AI Orchestration Pipeline, LLM Integration, Database Design, User Management, Backend Lead*
 
 * **Ankit Kumar**
   GitHub: [@ankit9412](https://github.com/ankit9412)
-  *Role: 3D Web UI Development, Frontend Animation & Design, UX Implementation, Visualization Components, Presentation Assets*
+  *Role: 3D Web UI Development, Professional Interface Design, Three.js Integration, Animation Systems, Frontend Lead*
 
 ---
 
@@ -433,14 +518,41 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 - **Yophoria Innovation Challenge** – *Project built as part of the challenge under the role of AI Agent Engineer*
 - **DeepSeek AI** for providing excellent language model capabilities
 - **OpenRouter** for unified LLM API access
-- **FastAPI** for the robust web framework
+- **FastAPI** for the robust web framework with async support
 - **LangChain** for AI application development tools
 - **LangGraph** for workflow orchestration
+- **Three.js** for 3D graphics and animations
+- **SQLAlchemy** for database ORM and async support
+- **GSAP** for smooth animations and transitions
+- **Lucide** for beautiful icon system
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/utkarshverma439/ai-tutor-orchestrator/issues)
+- **Issues**: [GitHub Issues](https://github.com/utkarshverma439/mentoros/issues)
 - **Documentation**: This README and inline code comments
+- **Demo**: Live demo available at the deployed URL
+
+---
+
+## 🌟 **What's New in MentorOS v2.0**
+
+### 🆕 **Major Updates**
+- ✅ **Complete User Management** - Registration, login, profiles, and sessions
+- ✅ **Professional 3D Interface** - Glassmorphism design with Three.js integration
+- ✅ **Database Integration** - SQLite with async support for data persistence
+- ✅ **Settings Dashboard** - Comprehensive profile and preference management
+- ✅ **Data Export/Import** - Download and manage your learning data
+- ✅ **Enhanced Security** - Session tokens and secure authentication
+- ✅ **Mobile Optimization** - Responsive design for all devices
+- ✅ **Learning Analytics** - Progress tracking with visual indicators
+
+### 🎯 **Coming Soon**
+- 📊 Advanced analytics dashboard
+- 🎓 Multi-user classroom management
+- 🔗 Integration with external learning platforms
+- 📱 Mobile app companion
+- 🌐 Multi-language support
+- 🤖 Advanced AI tutoring models
 
 ---
 

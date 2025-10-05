@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to MentorOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .welcome-container {
+            text-align: center;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #b8c5d6;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .nav-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
+        
+        .features {
+            margin-top: 2rem;
+            text-align: left;
+        }
+        
+        .features h3 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+        
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features li {
+            padding: 0.5rem 0;
+            color: #b8c5d6;
+        }
+        
+        .features li::before {
+            content: '✨';
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1 class="logo">MentorOS</h1>
+        <p class="subtitle">Intelligent middleware for autonomous AI tutoring systems</p>
+        
+        <div class="nav-options">
+            <a href="/login.html" class="nav-btn">Experience Login</a>
+            <a href="/" class="nav-btn secondary">Go to Dashboard</a>
+        </div>
+        
+        <div class="features">
+            <h3>🚀 New Features</h3>
+            <ul>
+                <li>Professional 3D login interface with particle effects</li>
+                <li>Futuristic dashboard with glassmorphism design</li>
+                <li>Interactive navigation with neon glow effects</li>
+                <li>Real-time AI conversation with visual feedback</li>
+                <li>Animated progress tracking and user profiles</li>
+                <li>Responsive design for all devices</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

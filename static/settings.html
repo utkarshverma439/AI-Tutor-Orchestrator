@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentorOS - Settings</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Particle Network Background -->
+    <div class="particle-network" id="particle-network"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <i data-lucide="brain-circuit"></i>
+            </div>
+            <span class="nav-title">MentorOS</span>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="/" class="nav-item" data-page="dashboard">
+                <i data-lucide="home"></i>
+                <span>Dashboard</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="students">
+                <i data-lucide="users"></i>
+                <span>Students</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="sessions">
+                <i data-lucide="message-square"></i>
+                <span>Sessions</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="analytics">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Analytics</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item active" data-page="settings">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+                <div class="nav-glow"></div>
+            </a>
+        </div>
+        
+        <div class="nav-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i data-lucide="user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Demo User</span>
+                    <span class="user-role">Student</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i data-lucide="log-out"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header Status Bar -->
+        <header class="status-bar">
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    <span>AI Core Online</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    <span>Settings Synced</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    <span id="connection-status">Connected</span>
+                </div>
+            </div>
+            <div class="time-display" id="timeDisplay"></div>
+        </header>
+
+        <!-- Settings Content -->
+        <main class="settings-content">
+            <div class="settings-header">
+                <h1>Settings</h1>
+                <p>Customize your MentorOS experience and learning preferences</p>
+            </div>
+
+            <div class="settings-grid">
+                <!-- Student Profile Settings -->
+                <div class="settings-section">
+                    <div class="panel user-panel">
+                        <div class="panel-header">
+                            <div class="panel-icon">
+                                <i data-lucide="user-circle"></i>
+                            </div>
+                            <h3>Student Profile</h3>
+                            <div class="panel-glow"></div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="profile-avatar">
+                                <div class="avatar-ring"></div>
+                                <div class="avatar-inner">
+                                    <i data-lucide="user"></i>
+                                </div>
+                                <div class="avatar-status online"></div>
+                            </div>
+                            
+                            <div class="profile-form">
+                                <div class="form-group">
+                                    <label for="student-name">
+                                        <i data-lucide="user"></i>
+                                        Name
+                                    </label>
+                                    <div class="input-container">
+                                        <input type="text" id="student-name" value="Demo Student" />
+                                        <div class="input-border"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="student-email">
+                                        <i data-lucide="mail"></i>
+                                        Email
+                                    </label>
+                                    <div class="input-container">
+                                        <input type="email" id="student-email" value="demo@mentoros.ai" readonly />
+                                        <div class="input-border"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="grade-level">
+                                        <i data-lucide="graduation-cap"></i>
+                                        Grade Level
+                                    </label>
+                                    <div class="select-container">
+                                        <select id="grade-level">
+                                            <option value="6">6th Grade</option>
+                                            <option value="7">7th Grade</option>
+                                            <option value="8">8th Grade</option>
+                                            <option value="9">9th Grade</option>
+                                            <option value="10" selected>10th Grade</option>
+                                            <option value="11">11th Grade</option>
+                                            <option value="12">12th Grade</option>
+                                            <option value="college">College</option>
+                                        </select>
+                                        <div class="select-border"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="learning-style">
+                                        <i data-lucide="brain"></i>
+                                        Learning Style
+                                    </label>
+                                    <div class="select-container">
+                                        <select id="learning-style">
+                                            <option value="visual" selected>Visual Learner</option>
+                                            <option value="auditory">Auditory Learner</option>
+                                            <option value="kinesthetic">Kinesthetic Learner</option>
+                                            <option value="reading">Reading/Writing</option>
+                                        </select>
+                                        <div class="select-border"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="emotional-state">
+                                        <i data-lucide="heart"></i>
+                                        Current State
+                                    </label>
+                                    <div class="select-container">
+                                        <select id="emotional-state">
+                                            <option value="focused" selected>Focused & Motivated</option>
+                                            <option value="anxious">Anxious about Test</option>
+                                            <option value="confused">Confused & Need Help</option>
+                                            <option value="tired">Tired but Determined</option>
+                                        </select>
+                                        <div class="select-border"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="teaching-style">
+                                        <i data-lucide="book-open"></i>
+                                        Teaching Style
+                                    </label>
+                                    <div class="select-container">
+                                        <select id="teaching-style">
+                                            <option value="direct" selected>Direct Instruction</option>
+                                            <option value="socratic">Socratic Method</option>
+                                            <option value="visual">Visual Learning</option>
+                                            <option value="flipped_classroom">Flipped Classroom</option>
+                                        </select>
+                                        <div class="select-border"></div>
+                                    </div>
+                                </div>
+
+                                <button class="save-profile-btn" id="saveProfileBtn">
+                                    <i data-lucide="save"></i>
+                                    <span>Save Profile</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Preferences -->
+                <div class="settings-section">
+                    <div class="panel preferences-panel">
+                        <div class="panel-header">
+                            <div class="panel-icon">
+                                <i data-lucide="sliders"></i>
+                            </div>
+                            <h3>Preferences</h3>
+                            <div class="panel-glow"></div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="preferences-form">
+                                <div class="form-group">
+                                    <label>
+                                        <i data-lucide="palette"></i>
+                                        Theme
+                                    </label>
+                                    <div class="toggle-group">
+                                        <input type="radio" id="theme-dark" name="theme" value="dark" checked>
+                                        <label for="theme-dark" class="toggle-option">Dark</label>
+                                        <input type="radio" id="theme-light" name="theme" value="light">
+                                        <label for="theme-light" class="toggle-option">Light</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <i data-lucide="bell"></i>
+                                        Notifications
+                                    </label>
+                                    <div class="switch-container">
+                                        <input type="checkbox" id="notifications" class="switch" checked>
+                                        <label for="notifications" class="switch-label"></label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <i data-lucide="volume-2"></i>
+                                        Sound Effects
+                                    </label>
+                                    <div class="switch-container">
+                                        <input type="checkbox" id="sound-effects" class="switch" checked>
+                                        <label for="sound-effects" class="switch-label"></label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <i data-lucide="zap"></i>
+                                        Animations
+                                    </label>
+                                    <div class="switch-container">
+                                        <input type="checkbox" id="animations" class="switch" checked>
+                                        <label for="animations" class="switch-label"></label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        <i data-lucide="shield"></i>
+                                        Data Sharing
+                                    </label>
+                                    <div class="switch-container">
+                                        <input type="checkbox" id="data-sharing" class="switch">
+                                        <label for="data-sharing" class="switch-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="settings-section">
+                    <div class="panel data-panel">
+                        <div class="panel-header">
+                            <div class="panel-icon">
+                                <i data-lucide="database"></i>
+                            </div>
+                            <h3>Data Management</h3>
+                            <div class="panel-glow"></div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="data-actions">
+                                <div class="action-item">
+                                    <div class="action-info">
+                                        <h4>Export Chat History</h4>
+                                        <p>Download all your conversations and learning data</p>
+                                    </div>
+                                    <button class="action-btn export-btn" id="exportDataBtn">
+                                        <i data-lucide="download"></i>
+                                        <span>Export</span>
+                                    </button>
+                                </div>
+
+                                <div class="action-item">
+                                    <div class="action-info">
+                                        <h4>Clear Chat History</h4>
+                                        <p>Remove all conversation history (cannot be undone)</p>
+                                    </div>
+                                    <button class="action-btn danger-btn" id="clearHistoryBtn">
+                                        <i data-lucide="trash-2"></i>
+                                        <span>Clear</span>
+                                    </button>
+                                </div>
+
+                                <div class="action-item">
+                                    <div class="action-info">
+                                        <h4>Reset All Settings</h4>
+                                        <p>Restore all settings to default values</p>
+                                    </div>
+                                    <button class="action-btn danger-btn" id="resetSettingsBtn">
+                                        <i data-lucide="refresh-cw"></i>
+                                        <span>Reset</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="settings-section">
+                    <div class="panel about-panel">
+                        <div class="panel-header">
+                            <div class="panel-icon">
+                                <i data-lucide="info"></i>
+                            </div>
+                            <h3>About MentorOS</h3>
+                            <div class="panel-glow"></div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="about-content">
+                                <div class="about-logo">
+                                    <img src="favicon.png" alt="MentorOS" width="64" height="64">
+                                </div>
+                                <h4>MentorOS v1.0.0</h4>
+                                <p>Intelligent middleware for autonomous AI tutoring systems</p>
+                                
+                                <div class="about-stats">
+                                    <div class="about-stat">
+                                        <span class="stat-label">AI Model</span>
+                                        <span class="stat-value">DeepSeek Chat</span>
+                                    </div>
+                                    <div class="about-stat">
+                                        <span class="stat-label">Tools Available</span>
+                                        <span class="stat-value">3</span>
+                                    </div>
+                                    <div class="about-stat">
+                                        <span class="stat-label">Last Updated</span>
+                                        <span class="stat-value">Today</span>
+                                    </div>
+                                </div>
+
+                                <div class="about-links">
+                                    <a href="#" class="about-link">
+                                        <i data-lucide="book"></i>
+                                        Documentation
+                                    </a>
+                                    <a href="#" class="about-link">
+                                        <i data-lucide="help-circle"></i>
+                                        Support
+                                    </a>
+                                    <a href="#" class="about-link">
+                                        <i data-lucide="github"></i>
+                                        GitHub
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Saving settings...</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="settings-script.js"></script>
+</body>
+</html>

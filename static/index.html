@@ -4,37 +4,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Tutor Orchestrator</title>
+    <title>MentorOS - AI Tutoring Dashboard</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
 </head>
 
 <body>
-    <!-- Background Elements -->
-    <div class="bg-grid"></div>
-    <div class="bg-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Particle Network Background -->
+    <div class="particle-network" id="particle-network"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <i data-lucide="brain-circuit"></i>
+            </div>
+            <span class="nav-title">MentorOS</span>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <i data-lucide="home"></i>
+                <span>Dashboard</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="students">
+                <i data-lucide="users"></i>
+                <span>Students</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="sessions">
+                <i data-lucide="message-square"></i>
+                <span>Sessions</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="analytics">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Analytics</span>
+                <div class="nav-glow"></div>
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+                <div class="nav-glow"></div>
+            </a>
+        </div>
+        
+        <div class="nav-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i data-lucide="user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Demo User</span>
+                    <span class="user-role">Student</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i data-lucide="log-out"></i>
+            </button>
+        </div>
+    </nav>
 
     <!-- Main Container -->
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-brain"></i>
-                    <h1>AI Tutor Orchestrator</h1>
+        <!-- Header Status Bar -->
+        <header class="status-bar">
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    <span>AI Core Online</span>
                 </div>
-                <p class="subtitle">Intelligent middleware for autonomous AI tutoring systems</p>
-                <!-- <div class="status-indicator">
-                    <div class="status-dot"></div>
-                    <span id="connection-status">Connecting...</span> 
-                </div> -->
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    <span>Tools Ready</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot online"></div>
+                    <span id="connection-status">Connected</span>
+                </div>
             </div>
+            <div class="time-display" id="timeDisplay"></div>
         </header>
 
         <!-- Main Content -->
@@ -43,52 +101,98 @@
             <section class="chat-section">
                 <div class="chat-container">
                     <div class="chat-header">
-                        <h2><i class="fas fa-comments"></i> Conversation</h2>
+                        <div class="chat-title">
+                            <div class="chat-icon">
+                                <i data-lucide="message-circle"></i>
+                            </div>
+                            <h2>AI Conversation</h2>
+                            <div class="ai-status">
+                                <div class="ai-pulse"></div>
+                                <span>Active</span>
+                            </div>
+                        </div>
                         <div class="chat-controls">
                             <button class="btn-icon" id="clear-chat" title="Clear Chat">
-                                <i class="fas fa-trash"></i>
+                                <i data-lucide="trash-2"></i>
+                                <div class="btn-ripple"></div>
                             </button>
                             <button class="btn-icon" id="export-chat" title="Export Chat">
-                                <i class="fas fa-download"></i>
+                                <i data-lucide="download"></i>
+                                <div class="btn-ripple"></div>
+                            </button>
+                            <button class="btn-icon" id="toggle-history" title="Toggle History">
+                                <i data-lucide="history"></i>
+                                <div class="btn-ripple"></div>
                             </button>
                         </div>
                     </div>
 
                     <div class="chat-messages" id="chat-messages">
                         <div class="welcome-message">
-                            <div class="welcome-icon">
-                                <i class="fas fa-robot"></i>
+                            <div class="welcome-animation">
+                                <div class="hologram-ring"></div>
+                                <div class="hologram-ring"></div>
+                                <div class="hologram-ring"></div>
+                                <div class="welcome-icon">
+                                    <i data-lucide="brain-circuit"></i>
+                                </div>
                             </div>
-                            <h3>Welcome to AI Tutor Orchestrator!</h3>
-                            <p>I can help you with educational content by automatically selecting and coordinating the
-                                right tools. Try asking me to:</p>
-                            <ul>
-                                <li>Create notes on any topic</li>
-                                <li>Generate flashcards for studying</li>
-                                <li>Explain complex concepts</li>
-                                <li>Adapt content to your learning style</li>
-                            </ul>
+                            <h3>Welcome to MentorOS!</h3>
+                            <p>Your intelligent AI tutoring system is ready. I can orchestrate multiple educational tools to provide personalized learning experiences:</p>
+                            <div class="feature-grid">
+                                <div class="feature-card">
+                                    <i data-lucide="file-text"></i>
+                                    <span>Smart Notes</span>
+                                </div>
+                                <div class="feature-card">
+                                    <i data-lucide="layers"></i>
+                                    <span>Flashcards</span>
+                                </div>
+                                <div class="feature-card">
+                                    <i data-lucide="lightbulb"></i>
+                                    <span>Explanations</span>
+                                </div>
+                                <div class="feature-card">
+                                    <i data-lucide="target"></i>
+                                    <span>Adaptive Learning</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="chat-input-container">
                         <div class="input-wrapper">
+                            <div class="input-glow-ring"></div>
                             <textarea id="chat-input"
-                                placeholder="Ask me anything about learning... (e.g., 'I need help with calculus derivatives')"
+                                placeholder="Ask me anything about learning... I'll orchestrate the perfect tools for you."
                                 rows="1"></textarea>
                             <button class="send-button" id="send-button">
-                                <i class="fas fa-paper-plane"></i>
+                                <div class="send-icon">
+                                    <i data-lucide="send"></i>
+                                </div>
+                                <div class="send-particles"></div>
                             </button>
                         </div>
                         <div class="input-suggestions">
                             <button class="suggestion-chip" data-text="I need notes on photosynthesis">
-                                <i class="fas fa-sticky-note"></i> Create Notes
+                                <i data-lucide="file-text"></i>
+                                <span>Create Notes</span>
+                                <div class="chip-glow"></div>
                             </button>
                             <button class="suggestion-chip" data-text="Make flashcards for Spanish vocabulary">
-                                <i class="fas fa-layer-group"></i> Flashcards
+                                <i data-lucide="layers"></i>
+                                <span>Flashcards</span>
+                                <div class="chip-glow"></div>
                             </button>
                             <button class="suggestion-chip" data-text="Explain quantum mechanics simply">
-                                <i class="fas fa-lightbulb"></i> Explain Concept
+                                <i data-lucide="lightbulb"></i>
+                                <span>Explain</span>
+                                <div class="chip-glow"></div>
+                            </button>
+                            <button class="suggestion-chip" data-text="Help me study for my math test">
+                                <i data-lucide="target"></i>
+                                <span>Study Plan</span>
+                                <div class="chip-glow"></div>
                             </button>
                         </div>
                     </div>
@@ -97,60 +201,82 @@
 
             <!-- Sidebar -->
             <aside class="sidebar">
-                <!-- User Profile -->
-                <div class="panel user-panel">
+                <!-- Quick Stats Panel -->
+                <div class="panel stats-panel">
                     <div class="panel-header">
-                        <h3><i class="fas fa-user-graduate"></i> Student Profile</h3>
+                        <div class="panel-icon">
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                        <h3>Learning Stats</h3>
+                        <div class="panel-glow"></div>
                     </div>
                     <div class="panel-content">
-                        <div class="profile-form">
-                            <div class="form-group">
-                                <label for="student-name">Name</label>
-                                <input type="text" id="student-name" value="Demo Student" />
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i data-lucide="message-circle"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="total-conversations">0</span>
+                                    <span class="stat-label">Conversations</span>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="grade-level">Grade Level</label>
-                                <select id="grade-level">
-                                    <option value="6">6th Grade</option>
-                                    <option value="7">7th Grade</option>
-                                    <option value="8">8th Grade</option>
-                                    <option value="9">9th Grade</option>
-                                    <option value="10" selected>10th Grade</option>
-                                    <option value="11">11th Grade</option>
-                                    <option value="12">12th Grade</option>
-                                    <option value="college">College</option>
-                                </select>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i data-lucide="tool"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="tools-used">0</span>
+                                    <span class="stat-label">Tools Used</span>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="learning-style">Learning Style</label>
-                                <select id="learning-style">
-                                    <option value="visual" selected>Visual Learner</option>
-                                    <option value="auditory">Auditory Learner</option>
-                                    <option value="kinesthetic">Kinesthetic Learner</option>
-                                    <option value="reading">Reading/Writing</option>
-                                </select>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i data-lucide="clock"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="session-time">0m</span>
+                                    <span class="stat-label">Session Time</span>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="emotional-state">Current State</label>
-                                <select id="emotional-state">
-                                    <option value="focused" selected>Focused & Motivated</option>
-                                    <option value="anxious">Anxious about Test</option>
-                                    <option value="confused">Confused & Need Help</option>
-                                    <option value="tired">Tired but Determined</option>
-                                </select>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i data-lucide="target"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="success-rate">100%</span>
+                                    <span class="stat-label">Success Rate</span>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="teaching-style">Teaching Style</label>
-                                <select id="teaching-style">
-                                    <option value="direct" selected>Direct Instruction</option>
-                                    <option value="socratic">Socratic Method</option>
-                                    <option value="visual">Visual Learning</option>
-                                    <option value="flipped_classroom">Flipped Classroom</option>
-                                </select>
+                        </div>
+                        
+                        <div class="learning-progress">
+                            <h4>Learning Progress</h4>
+                            <div class="progress-rings">
+                                <div class="progress-ring" data-progress="75">
+                                    <svg class="progress-svg">
+                                        <circle class="progress-bg" cx="30" cy="30" r="25"></circle>
+                                        <circle class="progress-fill" cx="30" cy="30" r="25"></circle>
+                                    </svg>
+                                    <div class="progress-text">75%</div>
+                                    <span class="progress-label">Comprehension</span>
+                                </div>
+                                <div class="progress-ring" data-progress="60">
+                                    <svg class="progress-svg">
+                                        <circle class="progress-bg" cx="30" cy="30" r="25"></circle>
+                                        <circle class="progress-fill" cx="30" cy="30" r="25"></circle>
+                                    </svg>
+                                    <div class="progress-text">60%</div>
+                                    <span class="progress-label">Engagement</span>
+                                </div>
+                                <div class="progress-ring" data-progress="85">
+                                    <svg class="progress-svg">
+                                        <circle class="progress-bg" cx="30" cy="30" r="25"></circle>
+                                        <circle class="progress-fill" cx="30" cy="30" r="25"></circle>
+                                    </svg>
+                                    <div class="progress-text">85%</div>
+                                    <span class="progress-label">Retention</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,19 +336,29 @@
                     </div>
                 </div> -->
 
-                <!-- Recent Results -->
-                <div class="panel results-panel">
+                <!-- Activity Panel -->
+                <div class="panel activity-panel">
                     <div class="panel-header">
-                        <h3><i class="fas fa-chart-line"></i> Recent Results</h3>
+                        <div class="panel-icon">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <h3>Recent Activity</h3>
                         <button class="btn-icon" id="clear-results" title="Clear Results">
-                            <i class="fas fa-times"></i>
+                            <i data-lucide="x"></i>
+                            <div class="btn-ripple"></div>
                         </button>
+                        <div class="panel-glow"></div>
                     </div>
                     <div class="panel-content">
                         <div class="results-container" id="results-container">
                             <div class="no-results">
-                                <i class="fas fa-inbox"></i>
-                                <p>No results yet. Start a conversation to see orchestration results!</p>
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i data-lucide="inbox"></i>
+                                    </div>
+                                    <h4>No Activity Yet</h4>
+                                    <p>Start a conversation to see your learning orchestration results!</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -246,6 +382,7 @@
     <!-- Toast Notifications -->
     <div class="toast-container" id="toast-container"></div>
 
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="script.js"></script>
 </body>
 

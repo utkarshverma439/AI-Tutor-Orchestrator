@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentorOS - Login</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="login-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Particle Network Background -->
+    <div class="particle-network" id="particle-network"></div>
+    
+    <!-- Main Login Container -->
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i data-lucide="brain-circuit"></i>
+            </div>
+            <h1 class="logo-text">MentorOS</h1>
+            <p class="logo-subtitle">Intelligent middleware for autonomous AI tutoring systems</p>
+        </div>
+        
+        <!-- Login Card -->
+        <div class="login-card">
+            <div class="card-glow"></div>
+            <div class="card-content">
+                <h2>Welcome Back</h2>
+                <p class="login-subtitle">Sign in to your MentorOS dashboard</p>
+                
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i data-lucide="mail" class="input-icon"></i>
+                            <input type="email" id="email" placeholder="Email address" required>
+                            <div class="input-glow"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i data-lucide="lock" class="input-icon"></i>
+                            <input type="password" id="password" placeholder="Password" required>
+                            <div class="input-glow"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="remember">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">
+                        <span class="btn-text">Sign In</span>
+                        <div class="btn-glow"></div>
+                        <div class="btn-particles"></div>
+                    </button>
+                </form>
+                
+                <div class="divider">
+                    <span>or continue with</span>
+                </div>
+                
+                <div class="social-login">
+                    <button class="social-btn google-btn">
+                        <i data-lucide="chrome"></i>
+                        <span>Google</span>
+                    </button>
+                    <button class="social-btn github-btn">
+                        <i data-lucide="github"></i>
+                        <span>GitHub</span>
+                    </button>
+                </div>
+                
+                <div class="signup-link">
+                    Don't have an account? <a href="signup.html" id="createAccount">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p>Connecting to MentorOS...</p>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="login-script.js"></script>
+</body>
+</html>

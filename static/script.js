@@ -1,21 +1,32 @@
-// AI Tutor Orchestrator - Frontend JavaScript
-console.log('🚀 Script loaded');
+// MentorOS - Professional 3D AI Tutoring Dashboard
+console.log('🚀 MentorOS Loading...');
 
-class TutorOrchestrator {
+class MentorOS {
     constructor() {
-        console.log('🏗️ Constructor called');
+        console.log('🏗️ MentorOS Constructor called');
         this.apiBaseUrl = window.location.origin;
         this.isConnected = false;
         this.currentUser = this.getDefaultUser();
         this.chatHistory = [];
+        this.scene = null;
+        this.camera = null;
+        this.renderer = null;
+        this.particles = [];
+        this.mouseX = 0;
+        this.mouseY = 0;
         
         console.log('🌐 API Base URL:', this.apiBaseUrl);
         
         // Initialize after a short delay to ensure DOM is ready
         setTimeout(() => {
             this.initializeElements();
+            this.init3DBackground();
+            this.createParticleNetwork();
             this.bindEvents();
             this.testConnection();
+            this.updateTimeDisplay();
+            this.initProgressRings();
+            this.checkLoginState();
         }, 100);
     }
 
@@ -31,17 +42,21 @@ class TutorOrchestrator {
     }
 
     initializeElements() {
-        console.log('🔍 Initializing elements...');
+        console.log('🔍 Initializing MentorOS elements...');
         
         // Chat elements
         this.chatMessages = document.getElementById('chat-messages');
         this.chatInput = document.getElementById('chat-input');
         this.sendButton = document.getElementById('send-button');
         
+        // Navigation elements
+        this.navbar = document.getElementById('navbar');
+        this.navItems = document.querySelectorAll('.nav-item');
+        this.logoutBtn = document.getElementById('logoutBtn');
+        
         // Status elements
         this.connectionStatus = document.getElementById('connection-status');
-        this.aiModelStatus = document.getElementById('ai-model-status');
-        this.aiIndicator = document.getElementById('ai-indicator');
+        this.timeDisplay = document.getElementById('timeDisplay');
         
         // Profile elements
         this.studentName = document.getElementById('student-name');
@@ -60,19 +75,212 @@ class TutorOrchestrator {
         // Suggestion chips
         this.suggestionChips = document.querySelectorAll('.suggestion-chip');
         
-        console.log('✅ Element check:');
+        // 3D Background elements
+        this.bgCanvas = document.getElementById('bg-canvas');
+        this.particleNetwork = document.getElementById('particle-network');
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        console.log('✅ MentorOS Element check:');
         console.log('  chatInput:', this.chatInput ? '✅' : '❌');
         console.log('  sendButton:', this.sendButton ? '✅' : '❌');
         console.log('  chatMessages:', this.chatMessages ? '✅' : '❌');
-        console.log('  connectionStatus:', this.connectionStatus ? '✅' : '❌');
+        console.log('  navbar:', this.navbar ? '✅' : '❌');
+        console.log('  bgCanvas:', this.bgCanvas ? '✅' : '❌');
+    }
+
+    init3DBackground() {
+        if (!this.bgCanvas || typeof THREE === 'undefined') {
+            console.log('⚠️ Three.js not available, skipping 3D background');
+            return;
+        }
+        
+        try {
+            // Scene setup
+            this.scene = new THREE.Scene();
+            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            this.renderer = new THREE.WebGLRenderer({ canvas: this.bgCanvas, alpha: true });
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.renderer.setClearColor(0x000000, 0);
+            
+            // Camera position
+            this.camera.position.z = 5;
+            
+            // Create floating geometric shapes
+            this.createFloatingShapes();
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x00d4ff, 0.3);
+            this.scene.add(ambientLight);
+            
+            const pointLight = new THREE.PointLight(0x7c3aed, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            this.scene.add(pointLight);
+            
+            // Start animation loop
+            this.animate3D();
+            
+            console.log('✅ 3D Background initialized');
+        } catch (error) {
+            console.error('❌ 3D Background initialization failed:', error);
+        }
+    }
+    
+    createFloatingShapes() {
+        const geometries = [
+            new THREE.TetrahedronGeometry(0.5),
+            new THREE.OctahedronGeometry(0.3),
+            new THREE.IcosahedronGeometry(0.4),
+            new THREE.DodecahedronGeometry(0.3)
+        ];
+        
+        const materials = [
+            new THREE.MeshPhongMaterial({ 
+                color: 0x00d4ff, 
+                transparent: true, 
+                opacity: 0.6,
+                wireframe: true 
+            }),
+            new THREE.MeshPhongMaterial({ 
+                color: 0x7c3aed, 
+                transparent: true, 
+                opacity: 0.4,
+                wireframe: true 
+            }),
+            new THREE.MeshPhongMaterial({ 
+                color: 0x00ff88, 
+                transparent: true, 
+                opacity: 0.5,
+                wireframe: true 
+            })
+        ];
+        
+        for (let i = 0; i < 12; i++) {
+            const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+            const material = materials[Math.floor(Math.random() * materials.length)];
+            const mesh = new THREE.Mesh(geometry, material);
+            
+            mesh.position.x = (Math.random() - 0.5) * 20;
+            mesh.position.y = (Math.random() - 0.5) * 20;
+            mesh.position.z = (Math.random() - 0.5) * 10;
+            
+            mesh.rotation.x = Math.random() * Math.PI;
+            mesh.rotation.y = Math.random() * Math.PI;
+            
+            mesh.userData = {
+                rotationSpeed: {
+                    x: (Math.random() - 0.5) * 0.02,
+                    y: (Math.random() - 0.5) * 0.02,
+                    z: (Math.random() - 0.5) * 0.02
+                },
+                floatSpeed: Math.random() * 0.02 + 0.01,
+                floatRange: Math.random() * 2 + 1
+            };
+            
+            this.scene.add(mesh);
+            this.particles.push(mesh);
+        }
+    }
+    
+    createParticleNetwork() {
+        if (!this.particleNetwork) return;
+        
+        // Create floating particles
+        for (let i = 0; i < 40; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 8 + 's';
+            particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+            this.particleNetwork.appendChild(particle);
+        }
+        
+        // Create connecting lines
+        for (let i = 0; i < 15; i++) {
+            const line = document.createElement('div');
+            line.className = 'particle-line';
+            line.style.left = Math.random() * 100 + '%';
+            line.style.top = Math.random() * 100 + '%';
+            line.style.width = (Math.random() * 200 + 100) + 'px';
+            line.style.transform = `rotate(${Math.random() * 360}deg)`;
+            line.style.animationDelay = Math.random() * 4 + 's';
+            this.particleNetwork.appendChild(line);
+        }
+    }
+    
+    animate3D() {
+        if (!this.scene || !this.camera || !this.renderer) return;
+        
+        requestAnimationFrame(() => this.animate3D());
+        
+        // Animate floating shapes
+        this.particles.forEach((particle, index) => {
+            const userData = particle.userData;
+            
+            // Rotation
+            particle.rotation.x += userData.rotationSpeed.x;
+            particle.rotation.y += userData.rotationSpeed.y;
+            particle.rotation.z += userData.rotationSpeed.z;
+            
+            // Floating motion
+            particle.position.y += Math.sin(Date.now() * userData.floatSpeed + index) * 0.01;
+            
+            // Mouse interaction
+            const distance = particle.position.distanceTo(this.camera.position);
+            if (distance < 10) {
+                particle.position.x += this.mouseX * 0.01;
+                particle.position.y += this.mouseY * 0.01;
+            }
+        });
+        
+        // Camera slight movement based on mouse
+        this.camera.position.x += (this.mouseX * 0.3 - this.camera.position.x) * 0.05;
+        this.camera.position.y += (this.mouseY * 0.3 - this.camera.position.y) * 0.05;
+        this.camera.lookAt(this.scene.position);
+        
+        this.renderer.render(this.scene, this.camera);
     }
 
     bindEvents() {
-        console.log('🔗 Binding events...');
+        console.log('🔗 Binding MentorOS events...');
         
         if (!this.sendButton || !this.chatInput) {
             console.error('❌ Critical elements not found!');
             return;
+        }
+        
+        // Mouse movement for 3D parallax
+        document.addEventListener('mousemove', (e) => {
+            this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            if (this.camera && this.renderer) {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+        
+        // Navigation
+        this.navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleNavigation(item.dataset.page);
+            });
+        });
+        
+        // Logout
+        if (this.logoutBtn) {
+            this.logoutBtn.addEventListener('click', () => {
+                this.handleLogout();
+            });
         }
         
         // Send button click
@@ -95,6 +303,29 @@ class TutorOrchestrator {
             this.autoResizeTextarea();
         });
         
+        // Chat controls
+        const clearChatBtn = document.getElementById('clear-chat');
+        const exportChatBtn = document.getElementById('export-chat');
+        const toggleHistoryBtn = document.getElementById('toggle-history');
+        
+        if (clearChatBtn) {
+            clearChatBtn.addEventListener('click', () => {
+                this.clearChat();
+            });
+        }
+        
+        if (exportChatBtn) {
+            exportChatBtn.addEventListener('click', () => {
+                this.exportChat();
+            });
+        }
+        
+        if (toggleHistoryBtn) {
+            toggleHistoryBtn.addEventListener('click', () => {
+                this.toggleHistory();
+            });
+        }
+
         // Suggestion chips
         this.suggestionChips.forEach(chip => {
             chip.addEventListener('click', () => {
@@ -102,6 +333,9 @@ class TutorOrchestrator {
                 this.chatInput.value = text;
                 this.autoResizeTextarea();
                 this.chatInput.focus();
+                
+                // Add visual feedback
+                this.addChipClickEffect(chip);
             });
         });
         
@@ -115,7 +349,7 @@ class TutorOrchestrator {
                 });
         }
         
-        console.log('✅ Events bound successfully');
+        console.log('✅ MentorOS Events bound successfully');
     }
 
     async testConnection() {
@@ -493,7 +727,7 @@ class TutorOrchestrator {
         return topics[0] || 'general topic';
     }
 
-    addMessage(content, role) {
+    addMessage(content, role, removeWelcome = true) {
         console.log('💬 Adding message:', role, content.substring(0, 50) + '...');
         
         if (!this.chatMessages) {
@@ -516,10 +750,12 @@ class TutorOrchestrator {
         bubbleDiv.innerHTML = formattedContent;
         messageDiv.appendChild(bubbleDiv);
         
-        // Remove welcome message if it exists
-        const welcomeMessage = this.chatMessages.querySelector('.welcome-message');
-        if (welcomeMessage) {
-            welcomeMessage.remove();
+        // Remove welcome message if it exists and removeWelcome is true
+        if (removeWelcome) {
+            const welcomeMessage = this.chatMessages.querySelector('.welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
         }
         
         this.chatMessages.appendChild(messageDiv);
@@ -628,50 +864,408 @@ class TutorOrchestrator {
         }
     }
 
-    showToast(message, type = 'success') {
-        console.log(`🍞 Toast: ${type} - ${message}`);
+    updateTimeDisplay() {
+        if (!this.timeDisplay) return;
         
-        if (!this.toastContainer) return;
+        const updateTime = () => {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            this.timeDisplay.textContent = timeString;
+        };
         
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
+        updateTime();
+        setInterval(updateTime, 1000);
+    }
+    
+    initProgressRings() {
+        const progressRings = document.querySelectorAll('.progress-ring');
+        progressRings.forEach(ring => {
+            const progress = parseInt(ring.dataset.progress);
+            const circle = ring.querySelector('.progress-fill');
+            const circumference = 2 * Math.PI * 25; // radius = 25
+            const offset = circumference - (progress / 100) * circumference;
+            
+            setTimeout(() => {
+                circle.style.strokeDashoffset = offset;
+            }, 500);
+        });
+    }
+    
+    checkLoginState() {
+        const user = localStorage.getItem('mentorOS_user');
+        if (user) {
+            const userData = JSON.parse(user);
+            console.log('👤 User logged in:', userData.email);
+            
+            // Update user profile display
+            const userNameElement = document.querySelector('.user-name');
+            if (userNameElement && userData.email) {
+                userNameElement.textContent = userData.email.split('@')[0];
+            }
+        }
+    }
+    
+    handleNavigation(page) {
+        // Remove active class from all nav items
+        this.navItems.forEach(item => item.classList.remove('active'));
         
-        this.toastContainer.appendChild(toast);
+        // Add active class to clicked item
+        const activeItem = document.querySelector(`[data-page="${page}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
         
-        // Trigger animation
-        setTimeout(() => toast.classList.add('show'), 100);
+        // Handle navigation
+        const pageNames = {
+            dashboard: 'Dashboard',
+            students: 'Student Management',
+            sessions: 'Tutor Sessions',
+            analytics: 'Learning Analytics',
+            settings: 'System Settings'
+        };
         
-        // Remove after 3 seconds
+        if (page === 'dashboard') {
+            // Already on dashboard, do nothing
+            return;
+        } else if (page === 'settings') {
+            // Navigate to settings page
+            window.location.href = '/settings';
+            return;
+        } else {
+            // Show coming soon for other pages
+            this.showToast(`${pageNames[page]} - Coming Soon!`, 'info');
+        }
+    }
+    
+    handleLogout() {
+        // Clear login state
+        localStorage.removeItem('mentorOS_user');
+        localStorage.removeItem('mentorOS_remember');
+        
+        this.showToast('Logging out...', 'info');
+        
+        // Redirect to login after animation
         setTimeout(() => {
-            toast.classList.remove('show');
+            window.location.href = 'login.html';
+        }, 1500);
+    }
+    
+    addChipClickEffect(chip) {
+        // Add temporary glow effect
+        chip.style.transform = 'translateY(-3px) scale(1.05)';
+        chip.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.5)';
+        
+        setTimeout(() => {
+            chip.style.transform = '';
+            chip.style.boxShadow = '';
+        }, 300);
+    }
+    
+    async clearChat() {
+        if (!confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
+            return;
+        }
+        
+        this.showLoading(true);
+        
+        try {
+            const user = JSON.parse(localStorage.getItem('mentorOS_user') || '{}');
+            const userId = user.id || 'demo';
+            
+            const response = await fetch(`${this.apiBaseUrl}/user/${userId}/chat/history`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                // Clear the chat messages display
+                if (this.chatMessages) {
+                    this.chatMessages.innerHTML = `
+                        <div class="welcome-message">
+                            <div class="welcome-animation">
+                                <div class="hologram-ring"></div>
+                                <div class="hologram-ring"></div>
+                                <div class="hologram-ring"></div>
+                                <div class="welcome-icon">
+                                    <i data-lucide="brain-circuit"></i>
+                                </div>
+                            </div>
+                            <h3>Chat Cleared!</h3>
+                            <p>Your conversation history has been cleared. Start a new conversation below.</p>
+                            <div class="feature-grid">
+                                <div class="feature-card">
+                                    <i data-lucide="file-text"></i>
+                                    <span>Smart Notes</span>
+                                </div>
+                                <div class="feature-card">
+                                    <i data-lucide="layers"></i>
+                                    <span>Flashcards</span>
+                                </div>
+                                <div class="feature-card">
+                                    <i data-lucide="lightbulb"></i>
+                                    <span>Explanations</span>
+                                </div>
+                                <div class="feature-card">
+                                    <i data-lucide="target"></i>
+                                    <span>Adaptive Learning</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Reinitialize Lucide icons
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }
+                
+                // Clear local chat history
+                this.chatHistory = [];
+                
+                // Clear results container
+                if (this.resultsContainer) {
+                    this.resultsContainer.innerHTML = `
+                        <div class="no-results">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i data-lucide="inbox"></i>
+                                </div>
+                                <h4>No Activity Yet</h4>
+                                <p>Start a conversation to see your learning orchestration results!</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Reinitialize Lucide icons
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }
+                
+                this.showToast('Chat history cleared successfully!', 'success');
+            } else {
+                throw new Error('Failed to clear chat history');
+            }
+        } catch (error) {
+            console.error('❌ Clear chat error:', error);
+            this.showToast('Failed to clear chat history. Please try again.', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+    
+    async exportChat() {
+        this.showLoading(true);
+        
+        try {
+            const user = JSON.parse(localStorage.getItem('mentorOS_user') || '{}');
+            const userId = user.id || 'demo';
+            
+            const response = await fetch(`${this.apiBaseUrl}/user/${userId}/chat/export`);
+            
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mentoros_chat_export_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                this.showToast('Chat history exported successfully!', 'success');
+            } else {
+                // Fallback: export local chat history
+                const exportData = {
+                    user_id: userId,
+                    export_date: new Date().toISOString(),
+                    message_count: this.chatHistory.length,
+                    messages: this.chatHistory.map(msg => ({
+                        role: msg.role,
+                        content: msg.content,
+                        timestamp: new Date().toISOString()
+                    }))
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = window.URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mentoros_chat_export_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                this.showToast('Chat history exported (local data)!', 'success');
+            }
+        } catch (error) {
+            console.error('❌ Export chat error:', error);
+            this.showToast('Failed to export chat history. Please try again.', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+    
+    async toggleHistory() {
+        this.showLoading(true);
+        
+        try {
+            const user = JSON.parse(localStorage.getItem('mentorOS_user') || '{}');
+            const userId = user.id || 'demo';
+            
+            const response = await fetch(`${this.apiBaseUrl}/user/${userId}/chat/history?limit=20`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.success && data.messages.length > 0) {
+                    // Clear current messages
+                    if (this.chatMessages) {
+                        this.chatMessages.innerHTML = '';
+                        
+                        // Add history messages
+                        data.messages.forEach(msg => {
+                            this.addMessage(msg.content, msg.role, false);
+                        });
+                        
+                        this.showToast(`Loaded ${data.messages.length} previous messages`, 'info');
+                    }
+                } else {
+                    this.showToast('No chat history found', 'info');
+                }
+            } else {
+                this.showToast('Failed to load chat history', 'error');
+            }
+        } catch (error) {
+            console.error('❌ Toggle history error:', error);
+            this.showToast('Failed to load chat history', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    showToast(message, type = 'success') {
+        console.log(`🍞 MentorOS Toast: ${type} - ${message}`);
+        
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const colors = {
+            success: 'rgba(0, 255, 136, 0.9)',
+            error: 'rgba(255, 71, 87, 0.9)',
+            warning: 'rgba(255, 133, 0, 0.9)',
+            info: 'rgba(0, 212, 255, 0.9)'
+        };
+        
+        const icons = {
+            success: 'check-circle',
+            error: 'alert-circle',
+            warning: 'alert-triangle',
+            info: 'info'
+        };
+        
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i data-lucide="${icons[type] || 'info'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Style the toast
+        Object.assign(toast.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: colors[type] || colors.info,
+            color: 'white',
+            padding: '1rem 1.5rem',
+            borderRadius: '12px',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+            zIndex: '10000',
+            transform: 'translateX(100%)',
+            transition: 'transform 0.3s ease-out',
+            maxWidth: '400px',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+        });
+        
+        toast.querySelector('.toast-content').style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Initialize Lucide icon
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // Animate in
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after delay
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.parentNode.removeChild(toast);
                 }
             }, 300);
-        }, 3000);
+        }, 4000);
     }
 }
 
-// Initialize the application when DOM is loaded
+// Initialize MentorOS when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('📄 DOM loaded, initializing app...');
-    window.tutorOrchestrator = new TutorOrchestrator();
+    console.log('📄 DOM loaded, initializing MentorOS...');
+    
+    // Check if user is logged in (but allow demo mode)
+    const user = localStorage.getItem('mentorOS_user');
+    if (!user) {
+        console.log('🔒 No user session found, but continuing in demo mode...');
+        // For demo purposes, create a temporary user session
+        const demoUser = {
+            email: 'demo@mentoros.ai',
+            loginTime: new Date().toISOString(),
+            demo: true
+        };
+        localStorage.setItem('mentorOS_user', JSON.stringify(demoUser));
+    }
+    
+    window.mentorOS = new MentorOS();
     
     console.log(`
-    🧠 AI Tutor Orchestrator
-    ========================
+    🧠 MentorOS - Professional AI Tutoring System
+    =============================================
     
-    Welcome to the future of educational AI!
+    Welcome to the future of intelligent education!
     
-    Keyboard shortcuts:
+    🎯 Features:
+    • 3D Interactive Dashboard
+    • AI-Powered Tool Orchestration  
+    • Adaptive Learning Profiles
+    • Real-time Progress Tracking
+    
+    ⌨️ Keyboard shortcuts:
     • Ctrl/Cmd + K: Focus chat input
-    • Ctrl/Cmd + L: Clear chat
+    • Ctrl/Cmd + /: Toggle navigation
     • Enter: Send message
     • Shift + Enter: New line
     
-    Built with ❤️ using DeepSeek AI
+    Built with ❤️ using advanced AI & 3D graphics
     `);
 });
 
@@ -682,8 +1276,27 @@ document.addEventListener('keydown', (e) => {
             case 'k':
                 e.preventDefault();
                 const chatInput = document.getElementById('chat-input');
-                if (chatInput) chatInput.focus();
+                if (chatInput) {
+                    chatInput.focus();
+                    chatInput.select();
+                }
+                break;
+            case '/':
+                e.preventDefault();
+                const navbar = document.getElementById('navbar');
+                if (navbar) {
+                    document.body.classList.toggle('nav-collapsed');
+                }
                 break;
         }
+    }
+});
+
+// Handle page visibility for performance optimization
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        console.log('🔇 MentorOS paused (tab hidden)');
+    } else {
+        console.log('🔊 MentorOS resumed (tab visible)');
     }
 });
